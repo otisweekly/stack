@@ -22,7 +22,7 @@ enum ExportError: LocalizedError {
     }
 }
 
-final class ExportService {
+final class ExportService: @unchecked Sendable {
     static let shared = ExportService()
 
     private var exportSession: AVAssetExportSession?

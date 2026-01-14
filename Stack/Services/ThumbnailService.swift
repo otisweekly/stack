@@ -1,7 +1,7 @@
 import AVFoundation
 import UIKit
 
-final class ThumbnailService {
+final class ThumbnailService: @unchecked Sendable {
     static let shared = ThumbnailService()
 
     private let thumbnailSize = CGSize(width: 300, height: 533) // 9:16 aspect

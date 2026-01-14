@@ -1,14 +1,14 @@
 import AVFoundation
 
-final class StackInstruction: NSObject, AVVideoCompositionInstructionProtocol {
+final class StackInstruction: NSObject, AVVideoCompositionInstructionProtocol, @unchecked Sendable {
 
     // MARK: - AVVideoCompositionInstructionProtocol
 
-    var timeRange: CMTimeRange
-    var enablePostProcessing: Bool = false
-    var containsTweening: Bool = false
-    var requiredSourceTrackIDs: [NSValue]?
-    var passthroughTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
+    let timeRange: CMTimeRange
+    let enablePostProcessing: Bool = false
+    let containsTweening: Bool = false
+    let requiredSourceTrackIDs: [NSValue]?
+    let passthroughTrackID: CMPersistentTrackID = kCMPersistentTrackID_Invalid
 
     // MARK: - Custom Properties
 

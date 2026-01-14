@@ -3,7 +3,7 @@ import CoreImage
 
 // MARK: - Layer Transform Data
 
-struct LayerTransformData {
+struct LayerTransformData: Sendable {
     let trackID: CMPersistentTrackID?
     let position: CGPoint       // Normalized 0-1
     let size: CGSize            // Normalized 0-1
@@ -26,7 +26,7 @@ struct LayerTransformData {
 
 // MARK: - Stack Compositor
 
-final class StackCompositor: NSObject, AVVideoCompositing {
+final class StackCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
 
     // MARK: - AVVideoCompositing Properties
 
@@ -44,10 +44,14 @@ final class StackCompositor: NSObject, AVVideoCompositing {
         ]
     }
 
+    var supportsWideColorSourceFrames: Bool { false }
+    var supportsHDRSourceFrames: Bool { false }
+
     // MARK: - Properties
 
     private let ciContext: CIContext
     private let colorSpace: CGColorSpace
+    private let lock = NSLock()
     private var imageCache: [URL: CIImage] = [:]
 
     override init() {
@@ -59,7 +63,10 @@ final class StackCompositor: NSObject, AVVideoCompositing {
     // MARK: - AVVideoCompositing Methods
 
     func renderContextChanged(_ newRenderContext: AVVideoCompositionRenderContext) {
-        // Handle render context changes if needed
+        // Clear cache when context changes
+        lock.lock()
+        imageCache.removeAll()
+        lock.unlock()
     }
 
     func startRequest(_ request: AVAsynchronousVideoCompositionRequest) {
@@ -126,6 +133,9 @@ final class StackCompositor: NSObject, AVVideoCompositing {
     // MARK: - Private Methods
 
     private func loadImage(from url: URL) -> CIImage? {
+        lock.lock()
+        defer { lock.unlock() }
+
         if let cached = imageCache[url] {
             return cached
         }

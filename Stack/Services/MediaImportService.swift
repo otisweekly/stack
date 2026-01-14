@@ -23,7 +23,7 @@ enum MediaImportError: LocalizedError {
     }
 }
 
-final class MediaImportService {
+final class MediaImportService: @unchecked Sendable {
     static let shared = MediaImportService()
 
     private init() {}

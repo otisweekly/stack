@@ -1,5 +1,6 @@
 import UIKit
 
+@MainActor
 final class HapticsService {
     static let shared = HapticsService()
 
