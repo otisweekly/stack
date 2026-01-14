@@ -1,6 +1,6 @@
 import Foundation
 
-struct AppSettings: Codable {
+struct AppSettings: Codable, Equatable {
     var defaultImageDuration: TimeInterval = 1.0     // 0.5 - 5.0 seconds
     var defaultCanvasSize: CanvasSize = .portrait9x16
     var loopMediaByDefault: Bool = true
