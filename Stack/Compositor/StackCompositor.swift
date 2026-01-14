@@ -1,4 +1,4 @@
-import AVFoundation
+@preconcurrency import AVFoundation
 import CoreImage
 
 // MARK: - Layer Transform Data
@@ -26,7 +26,7 @@ struct LayerTransformData: Sendable {
 
 // MARK: - Stack Compositor
 
-final class StackCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
+final class StackCompositor: NSObject, @preconcurrency AVVideoCompositing, @unchecked Sendable {
 
     // MARK: - AVVideoCompositing Properties
 
