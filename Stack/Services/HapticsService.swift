@@ -1,8 +1,7 @@
 import UIKit
 
-@MainActor
-final class HapticsService {
-    static let shared = HapticsService()
+final class HapticsService: @unchecked Sendable {
+    nonisolated(unsafe) static let shared = HapticsService()
 
     private let lightGenerator = UIImpactFeedbackGenerator(style: .light)
     private let mediumGenerator = UIImpactFeedbackGenerator(style: .medium)
@@ -11,10 +10,14 @@ final class HapticsService {
     private let notificationGenerator = UINotificationFeedbackGenerator()
 
     private init() {
-        prepareAll()
+        // Prepare generators on main thread
+        Task { @MainActor in
+            self.prepareAll()
+        }
     }
 
-    func prepareAll() {
+    @MainActor
+    private func prepareAll() {
         lightGenerator.prepare()
         mediumGenerator.prepare()
         heavyGenerator.prepare()
@@ -22,30 +25,44 @@ final class HapticsService {
     }
 
     func light() {
-        lightGenerator.impactOccurred()
+        Task { @MainActor in
+            self.lightGenerator.impactOccurred()
+        }
     }
 
     func medium() {
-        mediumGenerator.impactOccurred()
+        Task { @MainActor in
+            self.mediumGenerator.impactOccurred()
+        }
     }
 
     func heavy() {
-        heavyGenerator.impactOccurred()
+        Task { @MainActor in
+            self.heavyGenerator.impactOccurred()
+        }
     }
 
     func selection() {
-        selectionGenerator.selectionChanged()
+        Task { @MainActor in
+            self.selectionGenerator.selectionChanged()
+        }
     }
 
     func success() {
-        notificationGenerator.notificationOccurred(.success)
+        Task { @MainActor in
+            self.notificationGenerator.notificationOccurred(.success)
+        }
     }
 
     func warning() {
-        notificationGenerator.notificationOccurred(.warning)
+        Task { @MainActor in
+            self.notificationGenerator.notificationOccurred(.warning)
+        }
     }
 
     func error() {
-        notificationGenerator.notificationOccurred(.error)
+        Task { @MainActor in
+            self.notificationGenerator.notificationOccurred(.error)
+        }
     }
 }

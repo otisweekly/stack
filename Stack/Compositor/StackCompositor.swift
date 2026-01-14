@@ -62,14 +62,14 @@ final class StackCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
 
     // MARK: - AVVideoCompositing Methods
 
-    func renderContextChanged(_ newRenderContext: AVVideoCompositionRenderContext) {
+    nonisolated func renderContextChanged(_ newRenderContext: AVVideoCompositionRenderContext) {
         // Clear cache when context changes
         lock.lock()
         imageCache.removeAll()
         lock.unlock()
     }
 
-    func startRequest(_ request: AVAsynchronousVideoCompositionRequest) {
+    nonisolated func startRequest(_ request: AVAsynchronousVideoCompositionRequest) {
         guard let instruction = request.videoCompositionInstruction as? StackInstruction else {
             request.finish(with: CompositorError.invalidInstruction)
             return
@@ -126,7 +126,7 @@ final class StackCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
         request.finish(withComposedVideoFrame: outputBuffer)
     }
 
-    func cancelAllPendingVideoCompositionRequests() {
+    nonisolated func cancelAllPendingVideoCompositionRequests() {
         // Cancel any pending work
     }
 
