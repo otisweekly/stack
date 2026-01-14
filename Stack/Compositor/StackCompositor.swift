@@ -26,16 +26,16 @@ struct LayerTransformData: Sendable {
 
 // MARK: - Stack Compositor
 
-final class StackCompositor: NSObject, @preconcurrency AVVideoCompositing, @unchecked Sendable {
+final class StackCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
 
     // MARK: - AVVideoCompositing Properties
 
-    var sourcePixelBufferAttributes: [String: Any]? = [
+    var sourcePixelBufferAttributes: [String: any Sendable]? = [
         kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
         kCVPixelBufferMetalCompatibilityKey as String: true
     ]
 
-    var requiredPixelBufferAttributesForRenderContext: [String: Any] = [
+    var requiredPixelBufferAttributesForRenderContext: [String: any Sendable] = [
         kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
         kCVPixelBufferMetalCompatibilityKey as String: true
     ]
