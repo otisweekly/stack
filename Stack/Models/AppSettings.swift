@@ -18,7 +18,7 @@ struct AppSettings: Codable {
 
     func save() {
         if let data = try? JSONEncoder().encode(self) {
-            UserDefaults.standard.set(data, forKey: key)
+            UserDefaults.standard.set(data, forKey: AppSettings.key)
         }
     }
 }
