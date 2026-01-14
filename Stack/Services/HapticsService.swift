@@ -1,7 +1,8 @@
 import UIKit
 
-final class HapticsService: @unchecked Sendable {
-    nonisolated(unsafe) static let shared = HapticsService()
+@MainActor
+final class HapticsService {
+    static let shared = HapticsService()
 
     private let lightGenerator = UIImpactFeedbackGenerator(style: .light)
     private let mediumGenerator = UIImpactFeedbackGenerator(style: .medium)
@@ -10,13 +11,9 @@ final class HapticsService: @unchecked Sendable {
     private let notificationGenerator = UINotificationFeedbackGenerator()
 
     private init() {
-        // Prepare generators on main thread
-        Task { @MainActor in
-            self.prepareAll()
-        }
+        prepareAll()
     }
 
-    @MainActor
     private func prepareAll() {
         lightGenerator.prepare()
         mediumGenerator.prepare()
@@ -25,44 +22,30 @@ final class HapticsService: @unchecked Sendable {
     }
 
     func light() {
-        Task { @MainActor in
-            self.lightGenerator.impactOccurred()
-        }
+        lightGenerator.impactOccurred()
     }
 
     func medium() {
-        Task { @MainActor in
-            self.mediumGenerator.impactOccurred()
-        }
+        mediumGenerator.impactOccurred()
     }
 
     func heavy() {
-        Task { @MainActor in
-            self.heavyGenerator.impactOccurred()
-        }
+        heavyGenerator.impactOccurred()
     }
 
     func selection() {
-        Task { @MainActor in
-            self.selectionGenerator.selectionChanged()
-        }
+        selectionGenerator.selectionChanged()
     }
 
     func success() {
-        Task { @MainActor in
-            self.notificationGenerator.notificationOccurred(.success)
-        }
+        notificationGenerator.notificationOccurred(.success)
     }
 
     func warning() {
-        Task { @MainActor in
-            self.notificationGenerator.notificationOccurred(.warning)
-        }
+        notificationGenerator.notificationOccurred(.warning)
     }
 
     func error() {
-        Task { @MainActor in
-            self.notificationGenerator.notificationOccurred(.error)
-        }
+        notificationGenerator.notificationOccurred(.error)
     }
 }

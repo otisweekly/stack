@@ -2,7 +2,7 @@ import Foundation
 import CoreGraphics
 import AVFoundation
 
-struct Composition: Identifiable, Codable {
+struct Composition: Identifiable, Codable, Equatable {
     let id: UUID
     var name: String
     var canvasSize: CanvasSize

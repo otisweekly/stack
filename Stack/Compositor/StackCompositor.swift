@@ -51,8 +51,6 @@ final class StackCompositor: NSObject, AVVideoCompositing {
 
     private let ciContext: CIContext
     private let colorSpace: CGColorSpace
-    private let lock = NSLock()
-    private var imageCache: [URL: CIImage] = [:]
 
     override init() {
         self.ciContext = CIContext(options: [.useSoftwareRenderer: false])
