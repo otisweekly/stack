@@ -32,6 +32,7 @@ enum ImportState: Equatable {
 }
 
 @Observable
+@MainActor
 final class ImportViewModel {
     var state: ImportState = .idle
     var showingPicker = false

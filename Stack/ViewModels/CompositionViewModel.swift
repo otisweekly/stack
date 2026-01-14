@@ -2,6 +2,7 @@ import SwiftUI
 import AVFoundation
 
 @Observable
+@MainActor
 final class CompositionViewModel {
     var composition: Composition
     var mediaItems: [MediaItem]
