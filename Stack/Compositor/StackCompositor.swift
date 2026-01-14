@@ -30,22 +30,22 @@ final class StackCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
 
     // MARK: - AVVideoCompositing Properties
 
-    var sourcePixelBufferAttributes: [String: Any]? {
+    nonisolated var sourcePixelBufferAttributes: [String: Any]? {
         [
             kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
             kCVPixelBufferMetalCompatibilityKey as String: true
         ]
     }
 
-    var requiredPixelBufferAttributesForRenderContext: [String: Any] {
+    nonisolated var requiredPixelBufferAttributesForRenderContext: [String: Any] {
         [
             kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
             kCVPixelBufferMetalCompatibilityKey as String: true
         ]
     }
 
-    var supportsWideColorSourceFrames: Bool { false }
-    var supportsHDRSourceFrames: Bool { false }
+    nonisolated var supportsWideColorSourceFrames: Bool { false }
+    nonisolated var supportsHDRSourceFrames: Bool { false }
 
     // MARK: - Properties
 
