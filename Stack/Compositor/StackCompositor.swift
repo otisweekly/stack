@@ -1,4 +1,4 @@
-@preconcurrency import AVFoundation
+import AVFoundation
 import CoreImage
 
 // MARK: - Layer Transform Data
@@ -26,22 +26,26 @@ struct LayerTransformData: Sendable {
 
 // MARK: - Stack Compositor
 
-final class StackCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
+final class StackCompositor: NSObject, AVVideoCompositing {
 
-    // MARK: - AVVideoCompositing Properties
+    // MARK: - AVVideoCompositing Properties (nonisolated as required by protocol)
 
-    var sourcePixelBufferAttributes: [String: any Sendable]? = [
-        kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
-        kCVPixelBufferMetalCompatibilityKey as String: true
-    ]
+    nonisolated var sourcePixelBufferAttributes: [String: any Sendable]? {
+        [
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+            kCVPixelBufferMetalCompatibilityKey as String: true
+        ]
+    }
 
-    var requiredPixelBufferAttributesForRenderContext: [String: any Sendable] = [
-        kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
-        kCVPixelBufferMetalCompatibilityKey as String: true
-    ]
+    nonisolated var requiredPixelBufferAttributesForRenderContext: [String: any Sendable] {
+        [
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+            kCVPixelBufferMetalCompatibilityKey as String: true
+        ]
+    }
 
-    var supportsWideColorSourceFrames: Bool { false }
-    var supportsHDRSourceFrames: Bool { false }
+    nonisolated var supportsWideColorSourceFrames: Bool { false }
+    nonisolated var supportsHDRSourceFrames: Bool { false }
 
     // MARK: - Properties
 
@@ -58,14 +62,11 @@ final class StackCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
 
     // MARK: - AVVideoCompositing Methods
 
-    func renderContextChanged(_ newRenderContext: AVVideoCompositionRenderContext) {
-        // Clear cache when context changes
-        lock.lock()
-        imageCache.removeAll()
-        lock.unlock()
+    nonisolated func renderContextChanged(_ newRenderContext: AVVideoCompositionRenderContext) {
+        // Context changes don't require cache clearing in this simple implementation
     }
 
-    func startRequest(_ request: AVAsynchronousVideoCompositionRequest) {
+    nonisolated func startRequest(_ request: AVAsynchronousVideoCompositionRequest) {
         guard let instruction = request.videoCompositionInstruction as? StackInstruction else {
             request.finish(with: CompositorError.invalidInstruction)
             return
@@ -96,13 +97,13 @@ final class StackCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
                     sourceImage = CIImage(cvPixelBuffer: sourceBuffer)
                 }
             } else if layerTransform.mediaType == .image, let imageURL = layerTransform.imageURL {
-                // Image layer
-                sourceImage = loadImage(from: imageURL)
+                // Image layer - load directly without caching for thread safety
+                sourceImage = CIImage(contentsOf: imageURL)
             }
 
             guard let source = sourceImage else { continue }
 
-            let transformedImage = transformLayer(
+            let transformedImage = Self.transformLayer(
                 source,
                 transform: layerTransform,
                 outputSize: outputSize
@@ -122,29 +123,13 @@ final class StackCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
         request.finish(withComposedVideoFrame: outputBuffer)
     }
 
-    func cancelAllPendingVideoCompositionRequests() {
+    nonisolated func cancelAllPendingVideoCompositionRequests() {
         // Cancel any pending work
     }
 
-    // MARK: - Private Methods
+    // MARK: - Private Methods (static for thread safety)
 
-    private func loadImage(from url: URL) -> CIImage? {
-        lock.lock()
-        defer { lock.unlock() }
-
-        if let cached = imageCache[url] {
-            return cached
-        }
-
-        guard let image = CIImage(contentsOf: url) else {
-            return nil
-        }
-
-        imageCache[url] = image
-        return image
-    }
-
-    private func transformLayer(
+    private static func transformLayer(
         _ image: CIImage,
         transform: LayerTransformData,
         outputSize: CGSize
