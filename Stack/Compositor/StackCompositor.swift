@@ -30,22 +30,18 @@ final class StackCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
 
     // MARK: - AVVideoCompositing Properties
 
-    nonisolated var sourcePixelBufferAttributes: [String: Any]? {
-        [
-            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
-            kCVPixelBufferMetalCompatibilityKey as String: true
-        ]
-    }
+    var sourcePixelBufferAttributes: [String: Any]? = [
+        kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+        kCVPixelBufferMetalCompatibilityKey as String: true
+    ]
 
-    nonisolated var requiredPixelBufferAttributesForRenderContext: [String: Any] {
-        [
-            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
-            kCVPixelBufferMetalCompatibilityKey as String: true
-        ]
-    }
+    var requiredPixelBufferAttributesForRenderContext: [String: Any] = [
+        kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+        kCVPixelBufferMetalCompatibilityKey as String: true
+    ]
 
-    nonisolated var supportsWideColorSourceFrames: Bool { false }
-    nonisolated var supportsHDRSourceFrames: Bool { false }
+    var supportsWideColorSourceFrames: Bool { false }
+    var supportsHDRSourceFrames: Bool { false }
 
     // MARK: - Properties
 
@@ -62,14 +58,14 @@ final class StackCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
 
     // MARK: - AVVideoCompositing Methods
 
-    nonisolated func renderContextChanged(_ newRenderContext: AVVideoCompositionRenderContext) {
+    func renderContextChanged(_ newRenderContext: AVVideoCompositionRenderContext) {
         // Clear cache when context changes
         lock.lock()
         imageCache.removeAll()
         lock.unlock()
     }
 
-    nonisolated func startRequest(_ request: AVAsynchronousVideoCompositionRequest) {
+    func startRequest(_ request: AVAsynchronousVideoCompositionRequest) {
         guard let instruction = request.videoCompositionInstruction as? StackInstruction else {
             request.finish(with: CompositorError.invalidInstruction)
             return
@@ -126,7 +122,7 @@ final class StackCompositor: NSObject, AVVideoCompositing, @unchecked Sendable {
         request.finish(withComposedVideoFrame: outputBuffer)
     }
 
-    nonisolated func cancelAllPendingVideoCompositionRequests() {
+    func cancelAllPendingVideoCompositionRequests() {
         // Cancel any pending work
     }
 
